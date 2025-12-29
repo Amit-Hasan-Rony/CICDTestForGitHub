@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  webapplication1:
+    image: amithasanrony/webapplication1:latest
+    ports:
+      - "8080:80"
+    restart: always
+
+  watchtower:
+    image: containrrr/watchtower:1.7.1
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_API_VERSION=1.44
+    command: --interval 30 --cleanup --debug
+

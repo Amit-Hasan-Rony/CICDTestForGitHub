@@ -1,0 +1,34 @@
+image: docker:20.10.16
+
+pipelines:
+  custom:
+
+    test-pipeline:
+      - step:
+          name: Test pipeline (cheap)
+          script:
+            - |
+              echo "Pipeline is working"
+              echo "Build number: ${BITBUCKET_BUILD_NUMBER}"
+
+    docker-build-push:
+      - step:
+          name: Build & Push Docker Image
+          services:
+            - docker
+          script:
+            - echo "Logging in to Docker Hub"
+            - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+
+            - echo "Building Docker image"
+            - docker build -t ${DOCKER_USERNAME}/webapplication1:${BITBUCKET_BUILD_NUMBER} .
+            - docker tag ${DOCKER_USERNAME}/webapplication1:${BITBUCKET_BUILD_NUMBER} ${DOCKER_USERNAME}/webapplication1:latest
+
+            - echo "Pushing Docker images"
+            - docker push ${DOCKER_USERNAME}/webapplication1:${BITBUCKET_BUILD_NUMBER}
+            - docker push ${DOCKER_USERNAME}/webapplication1:latest
+
+definitions:
+  services:
+    docker:
+      memory: 2048
